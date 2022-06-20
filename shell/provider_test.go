@@ -32,6 +32,7 @@ func TestProvider_impl(t *testing.T) {
 func TestProvider_HasChildResources(t *testing.T) {
 	expectedResources := []string{
 		"shell_script",
+		"shell_sensitive_script",
 	}
 
 	resources := testAccProvider.ResourcesMap
@@ -46,6 +47,7 @@ func TestProvider_HasChildResources(t *testing.T) {
 func TestProvider_HasChildDataSources(t *testing.T) {
 	expectedDataSources := []string{
 		"shell_script",
+		"shell_sensitive_script",
 	}
 
 	dataSources := testAccProvider.DataSourcesMap

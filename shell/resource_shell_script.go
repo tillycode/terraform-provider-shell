@@ -11,7 +11,7 @@ import (
 	"github.com/rs/xid"
 )
 
-func resourceShellScript() *schema.Resource {
+func resourceShellScript(sensitive_output bool) *schema.Resource {
 	return &schema.Resource{
 		Create: resourceShellScriptCreate,
 		Delete: resourceShellScriptDelete,
@@ -79,6 +79,7 @@ func resourceShellScript() *schema.Resource {
 				Type:     schema.TypeMap,
 				Computed: true,
 				Elem:     schema.TypeString,
+				Sensitive: sensitive_output,
 			},
 			"dirty": {
 				Type:     schema.TypeBool,
