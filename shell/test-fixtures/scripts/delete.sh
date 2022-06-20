@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 echo "deleting..."
 echo "writing some error" >&2
 

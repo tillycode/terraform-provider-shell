@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 echo "reading.."
 echo "writing some error" >&2
 
