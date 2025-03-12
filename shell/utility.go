@@ -48,11 +48,6 @@ func runCommand(c *CommandConfig) (map[string]string, error) {
 		return nil, fmt.Errorf("failed to initialize pipe for stdout: %s", err)
 	}
 	cmd.Stdout = pwStdout
-	prStderr, pwStderr, err := os.Pipe()
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize pipe for stderr: %s", err)
-	}
-	cmd.Stderr = pwStderr
 	cmd.Dir = c.WorkingDirectory
 
 	// Output what we're about to run
@@ -65,8 +60,6 @@ func runCommand(c *CommandConfig) (map[string]string, error) {
 	//send sdout and stderr to reader
 	logCh := make(chan string)
 	stdoutDoneCh := make(chan string)
-	stderrDoneCh := make(chan string)
-	go readOutput(prStderr, logCh, stderrDoneCh)
 	go readOutput(prStdout, logCh, stdoutDoneCh)
 
 	// get secret values (if any) to sanitize in logs
@@ -91,10 +84,8 @@ func runCommand(c *CommandConfig) (map[string]string, error) {
 	// Close the write-end of the pipe so that the goroutine mirroring output
 	// ends properly.
 	pwStdout.Close()
-	pwStderr.Close()
 
 	stdOutput := <-stdoutDoneCh
-	stdError := <-stderrDoneCh
 	close(logCh)
 
 	// If the script exited with a non-zero code then send the error up to Terraform
@@ -103,7 +94,6 @@ func runCommand(c *CommandConfig) (map[string]string, error) {
 		errorS += "Error: \n" + err.Error() + "\n\n"
 		errorS += "Command: \n" + sanitizeString(c.Command, secretValues) + "\n\n"
 		errorS += "StdOut: \n" + sanitizeString(stdOutput, secretValues) + "\n\n"
-		errorS += "StdErr: \n" + sanitizeString(stdError, secretValues) + "\n\n"
 		errorS += fmt.Sprintf("Env: \n%s\n\n", c.Environment)
 		if c.Action != ActionCreate {
 			stdin, _ := json.Marshal(c.PreviousOutput)
